@@ -1,7 +1,7 @@
-env/
-
-.env
+app.py
 
 *.DS_Store
 
-test.py
+env/
+
+.env
