@@ -1,13 +1,15 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema.retriever import BaseRetriever
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
+from langchain.schema.retriever import BaseRetriever
 from langchain.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain.chains import RetrievalQA
+from langchain.callbacks.manager import CallbackManagerForRetrieverRun
+from typing import List
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -216,19 +218,24 @@ class EnhancedPharaonicRAG:
             input_variables=["context", "question"]
         )
         
-        # Custom retriever that expands context
-        class ContextExpandedRetriever:
-            def __init__(self, base_retriever, expand_fn):
-                self.base_retriever = base_retriever
-                self.expand_fn = expand_fn
+        # Custom retriever that expands context - inherits from BaseRetriever
+        class ContextExpandedRetriever(BaseRetriever):
+            base_retriever: object
+            expand_fn: object
             
-            def get_relevant_documents(self, query):
+            class Config:
+                arbitrary_types_allowed = True
+            
+            def _get_relevant_documents(
+                self, query: str, *, run_manager: CallbackManagerForRetrieverRun = None
+            ) -> List[Document]:
+                """Get documents relevant to a query."""
                 base_docs = self.base_retriever.get_relevant_documents(query)
                 return self.expand_fn(base_docs, num_neighbors=1)
         
         expanded_retriever = ContextExpandedRetriever(
-            self.ensemble_retriever,
-            self._expand_context
+            base_retriever=self.ensemble_retriever,
+            expand_fn=self._expand_context
         )
         
         self.qa_chain = RetrievalQA.from_chain_type(
