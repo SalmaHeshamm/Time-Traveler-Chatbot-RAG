@@ -1,6 +1,10 @@
-app.py
+rag_engine.py
 
-*.DS_Store
+knowledge_base/
+
+.DS_Store
+
+temp_audio/
 
 env/
 
