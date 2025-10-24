@@ -25,9 +25,20 @@ except ImportError as e:
 # تحميل المتغيرات
 load_dotenv()
 
-# التحقق من وجود API Key
-if not os.getenv("GROQ_API_KEY"):
-    st.error("❌ GROQ_API_KEY غير موجود في ملف .env")
+# نحاول نقرأ المفتاح من st.secrets أولاً، ولو مش موجود نرجع لـ .env
+groq_api_key = None
+
+try:
+    groq_api_key = st.secrets.get("GROQ_API_KEY", None)
+except Exception:
+    pass  # st.secrets مش متاح محليًا
+
+if not groq_api_key:
+    groq_api_key = os.getenv("GROQ_API_KEY")
+
+# التحقق من وجود المفتاح
+if not groq_api_key:
+    st.error("❌ GROQ_API_KEY غير موجود في secrets أو ملف .env")
     st.stop()
 
 # إعداد الصفحة
