@@ -44,137 +44,142 @@ st.markdown("""
     /* الخلفية الرئيسية */
     .stApp {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff !important;
     }
-    
+
+    /* النصوص العامة */
+    body, p, div, span, label, textarea, input, h1, h2, h3, h4, h5, h6 {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+
     /* صندوق المحادثة */
     .main .block-container {
         padding: 2rem;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(10px);
     }
-    
+
     /* العناوين */
     h1 {
-        color: #667eea;
+        color: #ffffff !important;
         text-align: center;
         font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    
     h2, h3 {
-        color: #764ba2;
+        color: #ffffff !important;
     }
-    
+
     /* الأزرار */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: white !important;
         border: none;
         border-radius: 12px;
         padding: 0.75rem 2rem;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
     }
-    
+
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.8);
     }
-    
+
     /* صندوق الإجابة */
     .answer-box {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
         padding: 1.5rem;
         border-radius: 15px;
-        border-left: 5px solid #667eea;
+        border-left: 5px solid #ffffff;
         margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        color: #000 !important; /* النصوص بالأسود */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        color: #ffffff !important;
     }
     .answer-box p, .answer-box strong, .answer-box span, .answer-box div {
-        color: #000 !important;
-        -webkit-text-fill-color: #000 !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
     }
-    
+
     /* قائمة الاختيار */
     .stSelectbox > div > div {
-        background: white;
+        background: rgba(255,255,255,0.1);
         border-radius: 10px;
-        border: 2px solid #667eea;
-        color: #000 !important; /* النصوص بالأسود */
+        border: 2px solid #ffffff;
+        color: #ffffff !important;
     }
-    
+
     /* حقل النص */
     .stTextArea textarea, .stTextInput input {
         border-radius: 10px;
-        border: 2px solid #667eea;
+        border: 2px solid #ffffff;
         font-size: 16px;
-        color: #fff !important;  /* النصوص بالأبيض */
-        background: #1e1e1e;     /* خلفية داكنة عشان الأبيض يبان */
+        color: #ffffff !important;
+        background: rgba(255,255,255,0.1);
     }
     .stTextArea textarea::placeholder, .stTextInput input::placeholder {
-        color: rgba(255,255,255,0.7) !important;  /* placeholder بالأبيض */
+        color: rgba(255,255,255,0.7) !important;
         opacity: 1 !important;
     }
-    
+
     /* الشريط الجانبي */
     .css-1d391kg, [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3,
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
         color: white !important;
     }
-    
-    .css-1d391kg p, .css-1d391kg li,
-    [data-testid="stSidebar"] p, [data-testid="stSidebar"] li {
-        color: rgba(255,255,255,0.9) !important;
+
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] li {
+        color: #ffffff !important;
     }
-    
+
     /* صندوق المعلومات */
     .stInfo {
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        border-left: 5px solid #667eea;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.15) 100%);
+        border-left: 5px solid #ffffff;
+        color: #ffffff !important;
     }
-    
+
     /* شاشة البداية */
     .welcome-container {
         text-align: center;
         padding: 3rem 2rem;
+        color: #ffffff !important;
     }
-    
+
     .welcome-emoji {
         font-size: 120px;
         animation: float 3s ease-in-out infinite;
     }
-    
+
     @keyframes float {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-20px); }
     }
-    
+
     .welcome-title {
         font-size: 3rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin: 1rem 0;
     }
-    
+
     .welcome-subtitle {
         font-size: 1.2rem;
-        color: #666;
+        color: rgba(255,255,255,0.85);
         margin-bottom: 2rem;
     }
 </style>
 """, unsafe_allow_html=True)
-
-
 
 # ===== دالة توليد الصوت =====
 def text_to_speech(text, era_name):
@@ -229,7 +234,7 @@ if not st.session_state.started:
     <div class="welcome-container">
         <div class="welcome-emoji">✈️</div>
         <h1 class="welcome-title">Time Travel Chatbot</h1>
-        <p class="welcome-subtitle">سافر عبر العصور التاريخية المصرية واستمع لحكايات الأبطال 🌍</p>
+        <p class="welcome-subtitle">سافر عبر العصور التاريخية المصرية واكتشف أسرار الحضارات 🌍</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -242,7 +247,7 @@ if not st.session_state.started:
 else:
     # ===== واجهة الشات بوت =====
     st.title("🕰️ Time Travel Chatbot")
-    st.markdown("<p style='text-align:center; color:#666;'>سافر عبر العصور واستمع للحكايات 🏺</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; color:#666;'>استكشف العصور التاريخية المصرية 🏺</p>", unsafe_allow_html=True)
 
     @st.cache_resource
     def init_rag():
@@ -289,26 +294,17 @@ else:
         st.error("❌ لا توجد عصور محملة!")
         st.stop()
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        era_choice = st.selectbox(
-            "🌍 اختر العصر:",
-            list(available_eras.keys()),
-            format_func=lambda e: available_eras[e]
-        )
-    
-    with col2:
-        mode = st.radio(
-            "🎭 نوع المحتوى:",
-            ["معلومات", "حكايات"],
-            horizontal=True
-        )
+    # اختيار العصر فقط
+    era_choice = st.selectbox(
+        "🌍 اختر العصر:",
+        list(available_eras.keys()),
+        format_func=lambda e: available_eras[e]
+    )
 
     # حقل السؤال
     user_query = st.text_area(
         "💬 اكتب سؤالك هنا:",
-        placeholder="مثال: احكيلي عن حياة الفراعنة وانتصاراتهم العظيمة",
+        placeholder="مثال: من هو رمسيس الثاني وما هي إنجازاته؟",
         height=100
     )
 
@@ -327,18 +323,18 @@ else:
         if not user_query.strip():
             st.warning("⚠️ من فضلك اكتب سؤال أولاً.")
         else:
-            with st.spinner("🤔 جاري استحضار الحكاية من أعماق التاريخ..."):
+            with st.spinner("🤔 جاري البحث في أعماق التاريخ..."):
                 try:
                     if chatbot.switch_era(era_choice):
                         # الحصول على الإجابة
                         result = chatbot.ask(user_query)
                         
                         # عرض الإجابة بتصميم احترافي
-                        st.markdown("### 🎭 الحكاية:")
+                        st.markdown("### 📜 الإجابة:")
                         st.markdown(f"<div class='answer-box'><strong>{available_eras[era_choice]}</strong><br><br>{result}</div>", unsafe_allow_html=True)
                         
                         # توليد الصوت
-                        st.markdown("### 🔊 استمع للحكاية:")
+                        st.markdown("### 🔊 استمع للإجابة:")
                         
                         try:
                             audio_path = text_to_speech(result, era_choice)
@@ -382,7 +378,7 @@ else:
                                 st.download_button(
                                     label="📥 تحميل الصوت",
                                     data=audio_bytes,
-                                    file_name=f"story_{era_choice}.mp3",
+                                    file_name=f"answer_{era_choice}.mp3",
                                     mime="audio/mp3"
                                 )
                             else:
@@ -390,16 +386,12 @@ else:
                                 st.info("💡 تأكد من اتصالك بالإنترنت (gTTS يحتاج إنترنت)")
                                 
                         except Exception as e:
-                            st.error(f"❌ خطأ: {str(e)}")
+                            st.error(f"❌ خطأ في الصوت: {str(e)}")
                             st.info("💡 يمكنك قراءة النص أعلاه")
                         
                         # معلومات إضافية
                         with st.expander("ℹ️ تفاصيل الرحلة"):
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                st.info(f"🌍 **العصر:** {available_eras[era_choice]}")
-                            with col2:
-                                st.info(f"🎭 **النوع:** {mode}")
+                            st.info(f"🌍 **العصر:** {available_eras[era_choice]}")
                         
                     else:
                         st.error(f"❌ فشل الانتقال إلى {available_eras[era_choice]}")
@@ -435,10 +427,10 @@ else:
         st.markdown("---")
         st.markdown("### 💡 نصائح للاستخدام:")
         st.markdown("""
-        - 🎯 اسأل أسئلة محددة للحصول على حكايات مفصلة
-        - 🎭 اختر نوع "حكايات" لتجربة سرد درامية
+        - 🎯 اسأل أسئلة محددة للحصول على إجابات مفصلة
         - 🔊 فعّل الصوت لتجربة غامرة
         - 🌍 استكشف جميع العصور المختلفة
+        - 📖 اطلع على المعلومات التاريخية الدقيقة
         """)
         
         st.markdown("---")
