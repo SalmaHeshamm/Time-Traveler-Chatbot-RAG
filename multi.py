@@ -19,10 +19,6 @@ load_dotenv()
 
 
 class MultiEraEgyptianRAG:
-    """
-    نظام RAG متعدد العصور للتاريخ المصري
-    يدعم: الفرعوني، الوسطى، اليوناني، الروماني
-    """
     
     ERAS = {
         '1': {'name': 'pharaonic', 'name_ar': 'الفرعوني', 'emoji': '🏛️'},
@@ -33,13 +29,11 @@ class MultiEraEgyptianRAG:
     
     def __init__(self, model_name='sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 
                  chunk_size=500, chunk_overlap=150, parent_chunk_size=2000):
-        """تهيئة النظام مع دعم العصور المتعددة"""
         self.model_name = model_name
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.parent_chunk_size = parent_chunk_size
         
-        # تخزين منفصل لكل عصر
         self.era_data = {
             'pharaonic': self._init_era_structure(),
             'medieval': self._init_era_structure(),
@@ -47,7 +41,7 @@ class MultiEraEgyptianRAG:
             'roman': self._init_era_structure()
         }
         
-        self.current_era = None  # العصر الحالي النشط
+        self.current_era = None
         self.embeddings = None
         
         self.llm = ChatGroq(
@@ -58,7 +52,6 @@ class MultiEraEgyptianRAG:
         )
         
     def _init_era_structure(self):
-        """إنشاء هيكل بيانات لكل عصر"""
         return {
             'vectorstore': None,
             'bm25_retriever': None,
@@ -71,7 +64,6 @@ class MultiEraEgyptianRAG:
         }
     
     def load_text_file(self, file_path):
-        """تحميل النص من ملف"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return f.read()
@@ -80,7 +72,6 @@ class MultiEraEgyptianRAG:
                 return f.read()
     
     def build_era_knowledge_base(self, era_name, file_path):
-        """بناء قاعدة معرفية لعصر معين"""
         if era_name not in self.era_data:
             raise ValueError(f"عصر غير معروف: {era_name}")
         
@@ -95,7 +86,6 @@ class MultiEraEgyptianRAG:
         
         print(f"✂️  تقسيم النص بنظام Parent-Child...")
         
-        # إنشاء Parent chunks
         parent_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.parent_chunk_size,
             chunk_overlap=400,
@@ -106,7 +96,6 @@ class MultiEraEgyptianRAG:
         
         parent_docs = parent_splitter.create_documents([text])
         
-        # إنشاء Child chunks
         child_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap,
@@ -115,7 +104,6 @@ class MultiEraEgyptianRAG:
             keep_separator=True
         )
         
-        # ربط Parent-Child
         for parent_idx, parent_doc in enumerate(parent_docs):
             children = child_splitter.split_documents([parent_doc])
             
@@ -133,14 +121,11 @@ class MultiEraEgyptianRAG:
         print(f"   ✅ {len(parent_docs)} parent chunks")
         print(f"   ✅ {len(era['child_documents'])} child chunks")
         
-        # إعداد Retrievers
         print(f"🧠 إعداد نظام البحث الهجين...")
         
-        # BM25
         era['bm25_retriever'] = BM25Retriever.from_documents(era['child_documents'])
         era['bm25_retriever'].k = 6
         
-        # Embeddings & FAISS
         if self.embeddings is None:
             print(f"   📊 إنشاء نموذج Embeddings...")
             self.embeddings = HuggingFaceEmbeddings(
@@ -152,20 +137,17 @@ class MultiEraEgyptianRAG:
         era['vectorstore'] = FAISS.from_documents(era['child_documents'], self.embeddings)
         faiss_retriever = era['vectorstore'].as_retriever(search_kwargs={"k": 6})
         
-        # Ensemble
         era['ensemble_retriever'] = EnsembleRetriever(
             retrievers=[era['bm25_retriever'], faiss_retriever],
             weights=[0.4, 0.6]
         )
         
-        # QA Chain
         self._setup_era_qa_chain(era_name)
         
         era['loaded'] = True
         print(f"✅ قاعدة معرفة العصر {name_ar} جاهزة!\n")
     
     def _expand_context(self, era_name, retrieved_docs, num_neighbors=1):
-        """توسيع السياق بإضافة الأجزاء المجاورة"""
         era = self.era_data[era_name]
         expanded_docs = []
         seen_chunks = set()
@@ -178,7 +160,6 @@ class MultiEraEgyptianRAG:
             if chunk_id in seen_chunks:
                 continue
             
-            # البحث عن الأجزاء المجاورة
             neighbors = []
             for offset in range(-num_neighbors, num_neighbors + 1):
                 neighbor_id = f"{era_name}_p{parent_idx}_c{child_idx + offset}"
@@ -204,7 +185,6 @@ class MultiEraEgyptianRAG:
         return expanded_docs[:8]
     
     def _setup_era_qa_chain(self, era_name):
-        """إعداد QA chain لعصر معين"""
         era = self.era_data[era_name]
         name_ar = next(e['name_ar'] for e in self.ERAS.values() if e['name'] == era_name)
         
@@ -231,7 +211,6 @@ class MultiEraEgyptianRAG:
             input_variables=["context", "question"]
         )
         
-        # Custom Retriever مع توسيع السياق
         class ContextExpandedRetriever(BaseRetriever):
             base_retriever: object
             expand_fn: object
@@ -259,7 +238,6 @@ class MultiEraEgyptianRAG:
         )
     
     def save_all_eras(self, base_dir="knowledge_base"):
-        """حفظ جميع العصور"""
         Path(base_dir).mkdir(exist_ok=True)
         
         for era_name, era in self.era_data.items():
@@ -269,10 +247,8 @@ class MultiEraEgyptianRAG:
             era_dir = f"{base_dir}/{era_name}"
             Path(era_dir).mkdir(exist_ok=True)
             
-            # حفظ FAISS
             era['vectorstore'].save_local(f"{era_dir}/faiss_index")
             
-            # حفظ المستندات
             with open(f"{era_dir}/documents.pkl", 'wb') as f:
                 pickle.dump({
                     'child_documents': era['child_documents'],
@@ -280,7 +256,6 @@ class MultiEraEgyptianRAG:
                     'chunk_to_parent_map': era['chunk_to_parent_map']
                 }, f)
         
-        # حفظ التكوين العام
         with open(f"{base_dir}/config.pkl", 'wb') as f:
             pickle.dump({
                 'model_name': self.model_name,
@@ -292,8 +267,6 @@ class MultiEraEgyptianRAG:
         print(f"💾 تم حفظ جميع العصور في {base_dir}/")
     
     def load_all_eras(self, base_dir="knowledge_base"):
-        """تحميل جميع العصور"""
-        # تحميل التكوين
         with open(f"{base_dir}/config.pkl", 'rb') as f:
             config = pickle.load(f)
             self.model_name = config['model_name']
@@ -301,7 +274,6 @@ class MultiEraEgyptianRAG:
             self.chunk_overlap = config['chunk_overlap']
             self.parent_chunk_size = config['parent_chunk_size']
         
-        # تحميل Embeddings
         if self.embeddings is None:
             self.embeddings = HuggingFaceEmbeddings(
                 model_name=self.model_name,
@@ -309,7 +281,6 @@ class MultiEraEgyptianRAG:
                 encode_kwargs={'normalize_embeddings': True}
             )
         
-        # تحميل كل عصر
         for era_name in self.era_data.keys():
             era_dir = f"{base_dir}/{era_name}"
             
@@ -318,21 +289,18 @@ class MultiEraEgyptianRAG:
             
             era = self.era_data[era_name]
             
-            # تحميل المستندات
             with open(f"{era_dir}/documents.pkl", 'rb') as f:
                 data = pickle.load(f)
                 era['child_documents'] = data['child_documents']
                 era['parent_documents'] = data['parent_documents']
                 era['chunk_to_parent_map'] = data['chunk_to_parent_map']
             
-            # تحميل FAISS
             era['vectorstore'] = FAISS.load_local(
                 f"{era_dir}/faiss_index",
                 self.embeddings,
                 allow_dangerous_deserialization=True
             )
             
-            # إعادة بناء Retrievers
             era['bm25_retriever'] = BM25Retriever.from_documents(era['child_documents'])
             era['bm25_retriever'].k = 6
             
@@ -348,7 +316,6 @@ class MultiEraEgyptianRAG:
         print(f"✅ تم تحميل جميع العصور المتاحة!")
     
     def switch_era(self, era_name):
-        """التبديل إلى عصر معين"""
         if era_name not in self.era_data:
             return False
         
@@ -359,7 +326,6 @@ class MultiEraEgyptianRAG:
         return True
     
     def ask(self, query, era_name=None, return_sources=False):
-        """طرح سؤال على عصر معين"""
         if era_name:
             self.switch_era(era_name)
         
@@ -382,11 +348,9 @@ class MultiEraEgyptianRAG:
         return response if return_sources else response['answer']
     
     def get_loaded_eras(self):
-        """الحصول على قائمة العصور المحملة"""
         return [name for name, era in self.era_data.items() if era['loaded']]
     
     def display_main_menu(self):
-        """عرض القائمة الرئيسية"""
         print("\n" + "="*70)
         print("🏺 نظام RAG للتاريخ المصري عبر العصور")
         print("="*70)
@@ -413,12 +377,10 @@ class MultiEraEgyptianRAG:
         print("="*70)
     
     def chat(self):
-        """واجهة المحادثة التفاعلية"""
         self.display_main_menu()
         
         while True:
             try:
-                # عرض العصر الحالي
                 if self.current_era:
                     emoji = next(e['emoji'] for e in self.ERAS.values() if e['name'] == self.current_era)
                     name_ar = next(e['name_ar'] for e in self.ERAS.values() if e['name'] == self.current_era)
@@ -431,7 +393,6 @@ class MultiEraEgyptianRAG:
                 if not user_input:
                     continue
                 
-                # التحقق من الأوامر
                 if user_input.lower() in ['quit', 'exit', 'خروج', 'q']:
                     print("\n👋 شكراً لاستخدامك النظام. وداعاً!")
                     break
@@ -440,7 +401,6 @@ class MultiEraEgyptianRAG:
                     self.display_main_menu()
                     continue
                 
-                # التبديل بين العصور
                 if user_input in self.ERAS:
                     era_info = self.ERAS[user_input]
                     if self.switch_era(era_info['name']):
@@ -449,7 +409,6 @@ class MultiEraEgyptianRAG:
                         print(f"\n❌ العصر {era_info['name_ar']} غير محمّل!")
                     continue
                 
-                # طرح سؤال
                 if self.current_era is None:
                     print("⚠️  اختر عصراً أولاً! (1-4)")
                     continue
@@ -459,7 +418,6 @@ class MultiEraEgyptianRAG:
                 
                 print(f"\n💬 {result['answer']}\n")
                 
-                # عرض المصادر (اختياري)
                 show = input("📚 عرض المصادر؟ (y/n): ").strip().lower()
                 if show == 'y':
                     print("\n" + "="*60)
@@ -477,16 +435,13 @@ class MultiEraEgyptianRAG:
                 print(f"\n❌ خطأ: {str(e)}")
 
 
-# === الاستخدام ===
 if __name__ == "__main__":
-    # إنشاء النظام
     chatbot = MultiEraEgyptianRAG(
         chunk_size=500,
         chunk_overlap=150,
         parent_chunk_size=2000
     )
     
-    # هيكل الملفات المتوقع:
     era_files = {
         'pharaonic': 'data/pharaonic/pharaonic_info.txt',
         'medieval': 'data/medieval/medieval_info.txt',
@@ -494,7 +449,6 @@ if __name__ == "__main__":
         'roman': 'data/roman/roman_info.txt'
     }
     
-    # بناء قواعد المعرفة (مرة واحدة فقط)
     print("🚀 بدء بناء قواعد المعرفة...\n")
     
     for era_name, file_path in era_files.items():
@@ -503,15 +457,9 @@ if __name__ == "__main__":
         else:
             print(f"⚠️  ملف {era_name} غير موجود: {file_path}")
     
-    # حفظ جميع العصور
     chatbot.save_all_eras()
     
-    # أو تحميل من الملفات المحفوظة:
-    # chatbot.load_all_eras()
-    
-    # اختيار عصر افتراضي
     if chatbot.get_loaded_eras():
         chatbot.switch_era(chatbot.get_loaded_eras()[0])
     
-    # بدء المحادثة
     chatbot.chat()
